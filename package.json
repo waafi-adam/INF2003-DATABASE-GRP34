@@ -1,0 +1,26 @@
+{
+  "name": "telebot-project",
+  "version": "1.0.0",
+  "description": "telegram bot that helps job seekers and companies match",
+  "main": "src/bot/index.js",
+  "scripts": {
+    "start": "node src/bot/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "checkCompanies": "node ./src/scripts/checkCompanies.js",
+    "checkProfiles": "node ./src/scripts/checkProfiles.js",
+    "checkUsers": "node ./src/scripts/checkUsers.js",
+    "checkResumes": "node src/scripts/checkResumes.js",
+    "checkAll": "node ./src/scripts/checkCompanies.js && node ./src/scripts/checkProfiles.js && node ./src/scripts/checkUsers.js && node src/scripts/checkResumes.js",
+    "deleteDB": "del /f /q .\\path\\to\\database.sqlite || true"
+  },
+  "author": "waafi-adam",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.3.1",
+    "mongoose": "^8.0.0",
+    "node-telegram-bot-api": "^0.64.0",
+    "sequelize": "^6.34.0",
+    "sqlite3": "^5.1.6"
+  }
+}
