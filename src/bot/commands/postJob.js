@@ -62,41 +62,6 @@ module.exports = (bot) => {
             delete chatJobDetails[chatId];
             });
             break;
-
-        case 'awaiting_applicant_name':
-            ApplicantProfile.create({
-              UserID: state.userId,
-              Name: msg.text.trim()
-            }).then(() => {
-              bot.sendMessage(chatId, 'Your applicant profile has been created.');
-              delete chatRegisterStates[chatId];
-            }).catch(error => {
-              console.error('Failed to create applicant profile:', error);
-              bot.sendMessage(chatId, 'An error occurred while creating your profile.');
-              delete chatRegisterStates[chatId];
-            });
-            break;
-    
-          case 'awaiting_company_name':
-            state.companyName = msg.text.trim();
-            state.step = 'awaiting_company_address';
-            bot.sendMessage(chatId, 'Please enter your company address:');
-            break;
-          case 'awaiting_company_address':
-            Company.create({
-              UserID: state.userId,
-              CompanyName: state.companyName,
-              Address: msg.text.trim()
-            }).then(() => {
-              bot.sendMessage(chatId, 'Your company profile has been created.');
-              delete chatRegisterStates[chatId];
-            }).catch(error => {
-              console.error('Failed to create company profile:', error);
-              bot.sendMessage(chatId, 'An error occurred while creating your company profile.');
-              delete chatRegisterStates[chatId];
-            });
-            break;
-    
           // Add more cases as needed.
         }
       });
