@@ -66,6 +66,7 @@ module.exports = (bot) => {
           });
         } else if (msg.text.toLowerCase() === 'no'){
           bot.sendMessage(chatId, 'Posting canceled.');
+          delete chatJobDetails[chatId];
         }
         break;
       // Add more cases as needed.

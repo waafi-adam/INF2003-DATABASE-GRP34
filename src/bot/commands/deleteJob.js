@@ -88,6 +88,7 @@ module.exports = (bot) => {
         }
         // Clear the state after processing
         delete chatJobDetails[chatId];
+        
         break;
 
       // Add more cases as needed.

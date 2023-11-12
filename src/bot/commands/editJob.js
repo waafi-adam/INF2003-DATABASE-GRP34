@@ -97,6 +97,7 @@ module.exports = (bot) => {
             });
         }else if (msg.text.toLowerCase() === 'no'){
           bot.sendMessage(chatId, 'Edit Job canceled.');
+          delete chatJobDetails[chatId];
         }
         break;
 
