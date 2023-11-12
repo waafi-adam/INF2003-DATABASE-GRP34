@@ -13,6 +13,7 @@ const registerCommand = require('./commands/register');
 const createResumeCommand = require('./commands/createResume');
 const postJobCommand = require('./commands/postJob');
 const editJobCommand = require('./commands/editJob');
+const deleteJobCommand = require('./commands/deleteJob');
 
 
 // Attach command handlers to the bot instance
@@ -23,6 +24,7 @@ registerCommand(bot);
 createResumeCommand(bot);
 postJobCommand(bot);
 editJobCommand(bot);
+deleteJobCommand(bot);
 
 
 // Export the bot instance in case we need it elsewhere
