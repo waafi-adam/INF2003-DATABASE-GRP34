@@ -18,7 +18,7 @@ module.exports = (bot) => {
     const company = await Company.findOne({ where: { UserID: userSession?.UserID } });
 
     chatJobDetails[chatId] = {
-      step: 'awaiting_jobID',
+      step: 'deleteJob_awaiting_jobID',
       jobID: null,
       companyID: company?.CompanyID,
       jobTitle: '',
@@ -52,7 +52,7 @@ module.exports = (bot) => {
 
     // Depending on the step, handle the message accordingly
     switch (state.step) {
-      case 'awaiting_jobID':
+      case 'deleteJob_awaiting_jobID':
         state.jobID = parseInt(msg.text); // Assuming job ID is entered as a number
 
         // Display the job details to the user for confirmation
@@ -60,13 +60,13 @@ module.exports = (bot) => {
         if (jobToDelete) {
           bot.sendMessage(chatId, `Job ID: ${jobToDelete.JobID}\nTitle: ${jobToDelete.JobTitle}\nDescription: ${jobToDelete.JobDescription}`);
           bot.sendMessage(chatId, 'Do you want to delete this job? (yes/no)');
-          state.step = 'awaiting_confirmation';
+          state.step = 'deleteJob_awaiting_confirmation';
         } else {
           bot.sendMessage(chatId, 'Job not found. Please enter a valid job ID.');
         }
         break;
 
-      case 'awaiting_confirmation':
+      case 'deleteJob_awaiting_confirmation':
         if (msg.text.toLowerCase() === 'yes') {
           // Perform the delete
           Job.destroy({ where: { JobID: state.jobID } })
@@ -83,7 +83,7 @@ module.exports = (bot) => {
               console.error('Error deleting record:', error);
               bot.sendMessage(chatId, 'Error deleting record');
             });
-        } else {
+        } else  if (msg.text.toLowerCase() === 'no'){
           bot.sendMessage(chatId, 'Deletion canceled.');
         }
         // Clear the state after processing

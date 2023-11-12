@@ -12,20 +12,15 @@ module.exports = (bot) => {
     // Check session and role
     const userSession = await Session.findOne({ where: { chatId: chatId, IsLoggedIn: true } });
     const user = await User.findByPk(userSession?.UserID);
-    const company = await Company.findOne({ where: { UserID: userSession?.UserID} });
+    const company = await Company.findOne({ where: { UserID: userSession?.UserID } });
 
     chatJobDetails[chatId] = {
-      step: 'awaiting_jobTitle',
+      step: 'postJob_awaiting_jobTitle',
       jobID: null,
       companyID: company?.CompanyID,
       jobTitle: '',
       jobDescription: '',
     };
-
-    // Extract relevant information from userSession for the message text
-    const messageText = userSession ? `Welcome, ${user.UserRole}!` : 'Invalid session';
-
-    bot.sendMessage(chatId, messageText);
 
     if (!userSession || user?.UserRole !== 'Company') {
       return bot.sendMessage(chatId, 'You must be logged in with a company account to post a job.');
@@ -43,27 +38,37 @@ module.exports = (bot) => {
 
     // Depending on the step, handle the message accordingly
     switch (state.step) {
-      case 'awaiting_jobTitle':
+      case 'postJob_awaiting_jobTitle':
         state.jobTitle = msg.text;
-        state.step = 'awaiting_jobDescription';
+        state.step = 'postJob_awaiting_jobDescription';
         bot.sendMessage(chatId, 'Please enter a job description:');
         break;
-        case 'awaiting_jobDescription':
-            Job.create({
+      case 'postJob_awaiting_jobDescription':
+        state.jobDescription = msg.text;
+        bot.sendMessage(chatId, `Title: ${state.jobTitle}\nDescription: ${state.jobDescription}`);
+        bot.sendMessage(chatId, 'Do you want to post this job? (yes/no)');
+        state.step = 'postJob_awaiting_confirmation';
+        break;
+
+      case 'postJob_awaiting_confirmation':
+        if (msg.text.toLowerCase() === 'yes') {
+          Job.create({
             CompanyID: state.companyID,
             JobTitle: state.jobTitle,
-            JobDescription: msg.text.trim()
-            }).then(() => {
+            JobDescription: state.jobDescription
+          }).then(() => {
             bot.sendMessage(chatId, 'Your job listing has been posted.');
             delete chatJobDetails[chatId];
-            }).catch(error => {
+          }).catch(error => {
             console.error('Failed to post job listing:', error);
             bot.sendMessage(chatId, 'An error occurred while creating your job listing.');
             delete chatJobDetails[chatId];
-            });
-            break;
-          // Add more cases as needed.
+          });
+        } else if (msg.text.toLowerCase() === 'no'){
+          bot.sendMessage(chatId, 'Posting canceled.');
         }
-      });
-    };
-    
+        break;
+      // Add more cases as needed.
+    }
+  });
+};
