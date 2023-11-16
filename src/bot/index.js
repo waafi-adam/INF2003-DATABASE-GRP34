@@ -14,7 +14,8 @@ const createResumeCommand = require('./commands/createResume');
 const postJobCommand = require('./commands/postJob');
 const editJobCommand = require('./commands/editJob');
 const deleteJobCommand = require('./commands/deleteJob');
-
+const matchingJobCommand = require('./commands/requestMatchingJob.js');
+const matchingApplicantCommand = require('./commands/requestMatchingApplicant.js')
 
 // Attach command handlers to the bot instance
 startCommand(bot);
@@ -25,6 +26,8 @@ createResumeCommand(bot);
 postJobCommand(bot);
 editJobCommand(bot);
 deleteJobCommand(bot);
+matchingJobCommand(bot);
+matchingApplicantCommand(bot);
 
 
 // Export the bot instance in case we need it elsewhere
