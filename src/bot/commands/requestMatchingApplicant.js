@@ -1,7 +1,7 @@
 //company action. input: job output: applicant
 //return applicant's resume based on matching skills to job selected 
 
-//const { Resume } = require('../../database/nosql');
+const { Resume } = require('../../database/nosql');
 const { User, Session, Job, Company } = require('../../database/sql');
 
 module.exports = (bot) => {

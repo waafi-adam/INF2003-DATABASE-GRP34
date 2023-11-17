@@ -1,6 +1,6 @@
 //returns jobs that match the applicants skill based on the resume
 
-//const { Resume } = require('../../database/nosql');
+const { Resume } = require('../../database/nosql');
 const { User, Session, Job, Company } = require('../../database/sql');
 
 module.exports = (bot) => {
