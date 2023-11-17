@@ -19,12 +19,31 @@ module.exports = (bot) => {
     }
     //user is applicant
     else {
-      bot.sendMessage(chatId, "Looking for matchin jobs...");
+      bot.sendMessage(chatId, "Looking for your resume...");
+      bot.sendMessage(chatId, `User ID: ${userSession?.UserID}`); //for debugging purposes
+      
       //get user resume
+      let resume = await Resume.findOne({ userID: user.id});
+      //if resume exists
+      if (resume){
+        bot.sendMessage(chatId,'You have a resume!'); //debugging purposes 
+        const name = resume.personalDetails;  
+        bot.sendMessage(chatId, `${name}`);
+        
+        //get skills from resume
+        const skill_list = resume.skills;
+        console.log(skill_list);
 
-      //get skills from resume
+        //find jobs where resume.skill = job.skill
+        bot.sendMessage(chatId, "Looking for jobs matching your skills...");
 
-      //find jobs where resume.skill = job.skill
+        //return like 5(?) jobs
+        bot.sendMessage(chatId,"Here are the jobs based on your resume!")
+
+      }else{ //if resume doesnt exist :c
+        bot.sendMessage(chatId, 'You DONT have a resume :c'); //debugging purposes
+      }
+
     };
 
 

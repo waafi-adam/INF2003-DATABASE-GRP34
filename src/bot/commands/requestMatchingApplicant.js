@@ -1,11 +1,9 @@
 //company action. input: job output: applicant
 //return applicant's resume based on matching skills to job selected 
-
 const { Resume } = require('../../database/nosql');
 const { User, Session, Job, Company } = require('../../database/sql');
 
 module.exports = (bot) => {
-
   bot.onText(/\/matchingApplicant/, async (msg) => {
     const chatId = msg.chat.id;
 
@@ -13,27 +11,49 @@ module.exports = (bot) => {
     const userSession = await Session.findOne({ where: { chatId: chatId, IsLoggedIn: true } });
     const user = await User.findByPk(userSession?.UserID);
 
-    //check user role
+    // Check user role
     if (!userSession || user?.UserRole !== 'Company') {
       bot.sendMessage(chatId, 'You must be logged in with a company account!');
-      
-    }
-    //user is Company
-    else {
-        //list out jobs by the company
+    } else {
+      try {
+        const company = await Company.findByUserId(user.UserID);
 
-        //get user input for which job (jobID)
+        console.log(`User ID: ${user.UserID}`);
+        console.log(`Company ID: ${company.CompanyID}`);
 
-        //get job description
-
-        //get skills
-
-        //find resumes where resume.skill = job.skill
+        // SELECT Jobs FROM Company WHERE Company.CompanyID = compID
+        const companyJobs = await Job.findAll({
+          where: { CompanyID: company.CompanyID },
+        });
         
-        bot.sendMessage(chatId, "Looking for matching applicants...");
-      
-    };
+        //there are jobs
+        if (companyJobs.length > 0) {
+          console.log('Company Jobs:', companyJobs);
+          bot.sendMessage(chatId, "Wahoo!! there are jobs!");
+          //print all jobs
 
+          //get user to input the jobID
 
+          //retrieve job skill
+
+          //find resumes where skill is mentioned
+
+          //find user who is linked to resume
+
+          //return top 3? users
+        } 
+
+        //no jobs 
+        else {
+          console.log('No jobs found for the company.');
+          bot.sendMessage(chatId, "No jobs found for your company :c")
+        }
+
+        
+      } catch (error) {
+        console.error('Error:', error);
+        bot.sendMessage(chatId, 'An error occurred while processing your request.');
+      }
+    }
   });
 };
