@@ -1,6 +1,6 @@
 // src/bot/commands/logout.js
 const { Session } = require('../../database/sql');
-const commandHandler = require('../utils/commandHandler');
+const { commandHandler } = require('../utils/sessionUtils');
 
 const logoutLogic = async (msg, bot) => {
     const chatId = msg.chat.id;

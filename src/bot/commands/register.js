@@ -1,7 +1,7 @@
 // src/bot/commands/register.js
 const bcrypt = require('bcrypt');
 const { User, ApplicantProfile, Company } = require('../../database/sql');
-const commandHandler = require('../utils/commandHandler');
+const {commandHandler} = require('../utils/sessionUtils');
 const { waitForResponse, sendQuestionWithOptions } = require('../utils/messageUtils');
 
 const emailRegex = /\S+@\S+\.\S+/;

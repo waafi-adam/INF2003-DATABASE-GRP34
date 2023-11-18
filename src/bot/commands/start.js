@@ -12,7 +12,7 @@ const startCommand = (bot) => {
         let optionsMessage = 'Here are your available commands:\n';
         optionsMessage += userRole === 'Applicant'
           ? '/create_resume - Create your resume\n/search_jobs - Search for jobs\n'
-          : '/post_job - Post a new job\n/manage_jobs - Manage your job postings\n';
+          : '/post_job - Post a new job\n/edit_jobs - Manage your job postings\n';
         optionsMessage += '/logout - Log out';
 
         bot.sendMessage(chatId, `Welcome back! \n${optionsMessage}`);

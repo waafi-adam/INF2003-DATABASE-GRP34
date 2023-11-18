@@ -1,8 +1,9 @@
 // src/bot/commands/createResume.js
 const { User, ApplicantProfile, Session } = require('../../database/sql');
 const { Resume } = require('../../database/nosql');
-const commandHandler = require('../utils/commandHandler');
 const { waitForResponse, sendQuestionWithOptions } = require('../utils/messageUtils');
+const { commandHandler } = require('../utils/sessionUtils');
+
 
 const createResumeLogic = async (msg, bot) => {
     const chatId = msg.chat.id;

@@ -1,8 +1,8 @@
 // src/bot/commands/login.js
 const bcrypt = require('bcrypt');
 const { User, Session } = require('../../database/sql');
-const commandHandler = require('../utils/commandHandler');
 const { waitForResponse } = require('../utils/messageUtils');
+const { commandHandler } = require('../utils/sessionUtils');
 
 const loginLogic = async (msg, bot) => {
     const chatId = msg.chat.id;

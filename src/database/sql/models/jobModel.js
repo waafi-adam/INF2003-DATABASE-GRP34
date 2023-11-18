@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING
     },
     JobDescription: {
-      type: DataTypes.TEXT // Using TEXT datatype for longer strings
-    }
+      type: DataTypes.STRING
+    },
   });
 };
