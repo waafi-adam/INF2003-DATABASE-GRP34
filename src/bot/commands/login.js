@@ -1,53 +1,36 @@
 // src/bot/commands/login.js
 const bcrypt = require('bcrypt');
 const { User, Session } = require('../../database/sql');
+const { waitForResponse } = require('../utils/messageUtils');
+const { commandHandler } = require('../utils/sessionUtils');
 
-const loginCommand = (bot) => {
-  bot.onText(/\/login/, (msg) => {
+const loginLogic = async (msg, bot) => {
     const chatId = msg.chat.id;
     bot.sendMessage(chatId, 'Please enter your email:');
 
-    const emailListener = (msg) => {
-      const email = msg.text.trim().toLowerCase();
-      bot.removeListener('message', emailListener); // Remove the email listener
-      
-      bot.sendMessage(chatId, 'Please enter your password:');
-      
-      const passwordListener = (msg) => {
-        const password = msg.text.trim();
-        bot.removeListener('message', passwordListener); // Remove the password listener
+    const email = await waitForResponse(bot, chatId);
+    const user = await User.findOne({ where: { Email: email.trim().toLowerCase() } });
+    
+    if (!user) return bot.sendMessage(chatId, 'Email not found.');
 
-        // Authenticate the user
-        User.findOne({ where: { Email: email } }).then(user => {
-          if (!user) {
-            return bot.sendMessage(chatId, 'Email not found.');
-          }
+    bot.sendMessage(chatId, 'Please enter your password:');
+    const password = await waitForResponse(bot, chatId);
 
-          bcrypt.compare(password, user.Password).then(isMatch => {
-            if (!isMatch) {
-              return bot.sendMessage(chatId, 'Password is incorrect.');
-            }
+    const isMatch = await bcrypt.compare(password.trim(), user.Password);
+    if (!isMatch) return bot.sendMessage(chatId, 'Password is incorrect.');
 
-            // Handle session creation or update
-            Session.upsert({
-              UserID: user.UserID,
-              chatId: chatId,
-              IsLoggedIn: true
-            }).then(() => {
-              bot.sendMessage(chatId, 'You are now logged in.');
-            });
-          });
-        }).catch(err => {
-          console.error('Login error:', err);
-          bot.sendMessage(chatId, 'An error occurred during login.');
-        });
-      };
+    // Update or create a session with the given chatId
+    await Session.upsert({
+        chatId: chatId,
+        UserID: user.UserID,
+        IsLoggedIn: true
+    });
 
-      bot.on('message', passwordListener);
-    };
+    bot.sendMessage(chatId, 'You are now logged in.');
+};
 
-    bot.on('message', emailListener);
-  });
+const loginCommand = (bot) => {
+    bot.onText(/\/login/, commandHandler(bot, loginLogic, { requireLogout: true }));
 };
 
 module.exports = loginCommand;
