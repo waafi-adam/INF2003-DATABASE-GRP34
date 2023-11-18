@@ -4,7 +4,7 @@ const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: 'path/to/database.sqlite',
+  storage: './src/database/sql/database.sqlite', // Updated storage path
   logging: false
 });
 
@@ -43,8 +43,8 @@ db.JobRequest.belongsTo(db.User, { foreignKey: 'UserID' });
 db.Job.hasMany(db.JobRequest, { foreignKey: 'JobID' });
 db.JobRequest.belongsTo(db.Job, { foreignKey: 'JobID' });
 
-db.User.hasOne(db.Session, { foreignKey: 'UserID' });
-db.Session.belongsTo(db.User, { foreignKey: 'UserID' });
+// db.User.hasOne(db.Session, { foreignKey: 'UserID' });
+// db.Session.belongsTo(db.User, { foreignKey: 'UserID' });
 
 // Skills associations would be many-to-many, require a join table
 db.Skill.belongsToMany(db.ApplicantProfile, { through: 'ProfileSkills', foreignKey: 'SkillID' });

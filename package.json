@@ -10,8 +10,11 @@
     "checkProfiles": "node ./src/scripts/checkProfiles.js",
     "checkUsers": "node ./src/scripts/checkUsers.js",
     "checkResumes": "node src/scripts/checkResumes.js",
-    "checkAll": "node ./src/scripts/checkCompanies.js && node ./src/scripts/checkProfiles.js && node ./src/scripts/checkUsers.js && node src/scripts/checkResumes.js",
-    "deleteDB": "del /f /q .\\path\\to\\database.sqlite || true"
+    "checkSessions": "node src/scripts/checkSessions.js",
+    "checkAll": "node ./src/scripts/checkCompanies.js && node ./src/scripts/checkProfiles.js && node ./src/scripts/checkUsers.js && node src/scripts/checkSessions.js && node src/scripts/checkResumes.js ",
+    "delAll": "node ./src/scripts/deleteMongoDB.js && del src\\database\\sql\\database.sqlite",
+    "delNoSql": "node ./src/scripts/deleteMongoDB.js",
+    "delSql": "del src\\database\\sql\\database.sqlite"
   },
   "author": "waafi-adam",
   "license": "ISC",
