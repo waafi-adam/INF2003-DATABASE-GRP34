@@ -33,13 +33,13 @@ module.exports = (bot) => {
       }
       
       //get user resume
-      let resume = await Resume.findOne({ userID: user.id});
+      let resume = await Resume.findOne({ userID: userSession?.UserID});
       //if resume exists
       if (resume){
         bot.sendMessage(chatId,'You have a resume!'); //debugging purposes 
-        const name = resume.personalDetails;  
-        bot.sendMessage(chatId, `${name}`);
-        
+        const name = resume.personalDetails;
+        console.log(name);
+                
         //get skills from resume
         const skill_list = resume.skills;
         console.log(skill_list);
