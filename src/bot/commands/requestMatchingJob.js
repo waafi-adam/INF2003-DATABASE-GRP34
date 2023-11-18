@@ -19,8 +19,18 @@ module.exports = (bot) => {
     }
     //user is applicant
     else {
+      //find all resumes 
       bot.sendMessage(chatId, "Looking for your resume...");
       bot.sendMessage(chatId, `User ID: ${userSession?.UserID}`); //for debugging purposes
+      const resumes = await Resume.find();
+      const count = await Resume.countDocuments();
+
+      if (!resumes){
+        console.log("no resumes in database!!");
+      }
+      else{
+        console.log("Number of records: ",count);
+      }
       
       //get user resume
       let resume = await Resume.findOne({ userID: user.id});
