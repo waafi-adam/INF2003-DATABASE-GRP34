@@ -11,14 +11,6 @@ module.exports = (bot) => {
     const userSession = await Session.findOne({ where: { chatId: chatId, IsLoggedIn: true } });
     const user = await User.findByPk(userSession?.UserID);
 
-    selectedJobDetails[chatId]={
-      step: 'awaiting_jobId',
-      jobID: null,
-      companyID: company?.CompanyID,
-      jobTitle: '',
-      jobDescription: '',
-    };
-    
     // Check user role
     if (!userSession || user?.UserRole !== 'Company') {
       bot.sendMessage(chatId, 'You must be logged in with a company account!');
@@ -43,11 +35,13 @@ module.exports = (bot) => {
       companyJobs.forEach((job) => {
         message += `\nJob ID: ${job.JobID}\nTitle: ${job.JobTitle}\nDescription: ${job.JobDescription}\n\n`;
       });
+      bot.sendMessage(chatId, "Enter the job ID to find applicants for: ");
     }else{
       console.log('No jobs found for the company.');
       bot.sendMessage(chatId, "No jobs found for your company :c");
       }
     };
+
   })
 
 };
