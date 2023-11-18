@@ -17,6 +17,8 @@ module.exports = (sequelize, DataTypes) => {
     JobTitle: {
       type: DataTypes.STRING
     },
-    // JobDescription is omitted because it's stored in MongoDB
+    JobDescription: {
+      type: DataTypes.TEXT // Using TEXT datatype for longer strings
+    }
   });
 };
