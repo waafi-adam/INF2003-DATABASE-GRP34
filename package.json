@@ -11,8 +11,9 @@
     "checkUsers": "node ./src/scripts/checkUsers.js",
     "checkResumes": "node src/scripts/checkResumes.js",
     "checkSessions": "node src/scripts/checkSessions.js",
+    "checkSessions": "node src/scripts/checkJobs.js",
     "checkAll": "node ./src/scripts/checkCompanies.js && node ./src/scripts/checkProfiles.js && node ./src/scripts/checkUsers.js && node src/scripts/checkSessions.js && node src/scripts/checkResumes.js ",
-    "delAll": "node ./src/scripts/deleteMongoDB.js && del src\\database\\sql\\database.sqlite",
+    "delAll": "node ./src/scripts/deleteMongoDB.js && node src/scripts/checkJobs.js && del src\\database\\sql\\database.sqlite",
     "delNoSql": "node ./src/scripts/deleteMongoDB.js",
     "delSql": "del src\\database\\sql\\database.sqlite"
   },

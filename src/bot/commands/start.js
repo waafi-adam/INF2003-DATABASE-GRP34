@@ -10,11 +10,21 @@ const startCommand = (bot) => {
       if (loggedIn) {
         const userRole = await getUserRole(chatId);
         let optionsMessage = 'Here are your available commands:\n';
-        optionsMessage += userRole === 'Applicant'
-          ? '/create_resume - Create your resume\n/search_jobs - Search for jobs\n'
-          : '/post_job - Post a new job\n/edit_jobs - Manage your job postings\n';
-        optionsMessage += '/logout - Log out';
 
+        if (userRole === 'Applicant') {
+          // Commands available to applicants
+          optionsMessage += '/create_resume - Create your resume\n';
+          optionsMessage += '/edit_resume - Edit your resume\n';
+          optionsMessage += '/matching_jobs - Find jobs matching your profile\n';
+        } else if (userRole === 'Company') {
+          // Commands available to companies
+          optionsMessage += '/post_job - Post a new job\n';
+          optionsMessage += '/edit_job - Edit your job postings\n';
+          optionsMessage += '/delete_job - Delete a job posting\n';
+          optionsMessage += '/matching_applicants - Find applicants matching your job postings\n';
+        }
+
+        optionsMessage += '/logout - Log out';
         bot.sendMessage(chatId, `Welcome back! \n${optionsMessage}`);
       } else {
         bot.sendMessage(chatId, 'Welcome to the Jobify Bot! Do you want to /login or /register?');
