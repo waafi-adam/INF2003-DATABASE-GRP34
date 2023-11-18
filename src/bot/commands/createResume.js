@@ -8,7 +8,7 @@ const { commandHandler } = require('../utils/sessionUtils');
 const createResumeLogic = async (msg, bot) => {
     const chatId = msg.chat.id;
 
-    // Fetch session to get the UserID
+    // Fetch session to get the applicantUserID
     const session = await Session.findOne({ where: { chatId: chatId } });
     if (!session || !session.UserID) {
         bot.sendMessage(chatId, "You must be logged in to create a resume.");
@@ -16,27 +16,27 @@ const createResumeLogic = async (msg, bot) => {
     }
 
     // Fetch user details from SQL database
-    const user = await User.findByPk(session.UserID);
-    if (!user) {
-        bot.sendMessage(chatId, "User not found in the database.");
+    const applicantProfile = await ApplicantProfile.findByPk(session.UserID);
+    if (!applicantProfile) {
+        bot.sendMessage(chatId, "ApplicantProfile not found in the database.");
         return;
     }
 
     // Fetch or create a resume
-    let resume = await Resume.findOne({ userID: user.UserID });
+    let resume = await Resume.findOne({ applicantUserID: applicantProfile.UserID });
     if (resume) {
-        return handleExistingResume(chatId, resume, user.UserID, bot);
+        return handleExistingResume(chatId, applicantProfile.UserID, bot);
     }
 
     // Fetch additional details from ApplicantProfile if needed
-    const profile = await ApplicantProfile.findOne({ where: { UserID: user.UserID } });
+    const profile = await ApplicantProfile.findOne({ where: { UserID: applicantProfile.UserID } });
 
-    // Create a new resume with user details
+    // Create a new resume with applicantProfile details
     resume = new Resume({
-        userID: user.UserID,
+        applicantUserID: applicantProfile.UserID,
         personalDetails: {
             name: profile ? profile.Name : '', // Assuming the name is stored in ApplicantProfile
-            email: user.Email,
+            email: applicantProfile.Email,
         }
     });
     await resume.save();
@@ -45,15 +45,15 @@ const createResumeLogic = async (msg, bot) => {
 
 
 
-const handleExistingResume = async (chatId, resume, userId, bot) => {
+const handleExistingResume = async (chatId, userId, bot) => {
     
     const response = await sendQuestionWithOptions(bot, chatId, 'You already have a resume. Do you want to edit it or restart from scratch?', ['Edit Resume', 'Restart Resume']);
 
     if (response === 'Edit Resume') {
         // Transfer to editResume.js logic
     } else if (response === 'Restart Resume') {
-        await Resume.deleteOne({ userID: userId });
-        const newResume = new Resume({ userID: userId });
+        await Resume.deleteOne({ applicantUserID: userId });
+        const newResume = new Resume({ applicantUserID: userId });
         await newResume.save();
         await processResumeCreation(chatId, newResume, bot);
     }

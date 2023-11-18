@@ -14,7 +14,7 @@ const editResumeLogic = async (msg, bot) => {
     }
 
     // Fetch the existing resume
-    let resume = await Resume.findOne({ userID: session.UserID });
+    let resume = await Resume.findOne({ applicantUserID: session.UserID });
     if (!resume) {
         bot.sendMessage(chatId, "You do not have a resume to edit. Please create one first.");
         return;

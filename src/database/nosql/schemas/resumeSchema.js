@@ -2,11 +2,11 @@
 const mongoose = require('mongoose');
 
 const resumeSchema = new mongoose.Schema({
-  userID: {
-    type: Number, // Reference to the SQL User table's primary key
+  applicantUserID: {
+    type: Number,
     required: true,
     unique: true,
-    ref: 'User' // Assuming you have a User model in MongoDB that corresponds to the SQL User
+    ref: 'ApplicantProfile' // Reference to the ApplicantProfile in SQL database
   },
   personalDetails: {
     name: String,

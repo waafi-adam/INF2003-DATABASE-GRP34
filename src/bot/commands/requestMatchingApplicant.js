@@ -58,7 +58,7 @@ module.exports = (bot) => {
               const matchingResumes = await Resume.find({ skills: { $in: jobSkills.map(skill => skill.SkillName) } });
 
               // Find user who is linked to resume
-              const matchingUsers = await User.find({ _id: { $in: matchingResumes.map(resume => resume.userID) } });
+              const matchingUsers = await User.find({ _id: { $in: matchingResumes.map(resume => resume.applicantUserID) } });
 
               // Return top 3 users
               const topMatchingUsers = matchingUsers.slice(0, 3);

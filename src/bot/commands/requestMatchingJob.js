@@ -5,7 +5,7 @@ const { User, Session, Job, Company } = require('../../database/sql');
 
 module.exports = (bot) => {
 
-  bot.onText(/\/matchingJob/, async (msg) => {
+  bot.onText(/\/matching_jobs/, async (msg) => {
     const chatId = msg.chat.id;
 
     // Check session and role
@@ -33,7 +33,7 @@ module.exports = (bot) => {
       }
       
       //get user resume
-      let resume = await Resume.findOne({ userID: userSession?.UserID});
+      let resume = await Resume.findOne({ applicantUserID: userSession?.UserID});
       //if resume exists
       if (resume){
         bot.sendMessage(chatId,'You have a resume!'); //debugging purposes 
