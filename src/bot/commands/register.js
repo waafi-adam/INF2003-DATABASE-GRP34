@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 // const { User, Applicant, Company } = require('../../database/sql');
 const {commandHandler} = require('../utils/sessionUtils');
 const { waitForResponse, sendQuestionWithOptions } = require('../utils/messageUtils');
+const { startLogic } = require('./start');
 
 const emailRegex = /\S+@\S+\.\S+/;
 
@@ -27,14 +28,16 @@ const registerLogic = async (msg, bot, db) => {
     bot.sendMessage(chatId, "You've selected: " + role + "\nPlease enter your email:");
     const email = await waitForResponse(bot, chatId);
     if (!emailRegex.test(email)) {
-        return bot.sendMessage(chatId, 'That does not look like a valid email. Please enter a valid email:');
+        await bot.sendMessage(chatId, 'That does not look like a valid email. Please enter a valid email:');
+        return startLogic(msg, bot, db);
     }
     state.email = email;
 
     bot.sendMessage(chatId, 'Please enter your password:');
     const password = await waitForResponse(bot, chatId);
     if (password.length < 5) {
-        return bot.sendMessage(chatId, 'Password too short. Please enter a password longer than 5 characters:');
+        await bot.sendMessage(chatId, 'Password too short. Please enter a password longer than 5 characters:');
+        return startLogic(msg, bot, db);
     }
     state.password = password;
 
@@ -66,8 +69,8 @@ const registerLogic = async (msg, bot, db) => {
         console.error('Error in registration:', error);
         bot.sendMessage(chatId, 'An error occurred during registration. It\'s possible the email is already in use.');
     }
-
     delete chatRegisterStates[chatId];
+    return startLogic(msg, bot, db);
 };
 
 const registerCommand = (bot, db) => {

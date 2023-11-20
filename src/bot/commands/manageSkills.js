@@ -3,6 +3,7 @@
 // const { Resume } = require('../../database/nosql');
 const { waitForResponse, sendQuestionWithOptions } = require('../utils/messageUtils');
 const { commandHandler } = require('../utils/sessionUtils');
+const { startLogic } = require('./start');
 
 const manageSkillsLogic = async (msg, bot, db) => {
     const { Applicant, Session, ApplicantSkill, Resume } = db;
@@ -13,7 +14,7 @@ const manageSkillsLogic = async (msg, bot, db) => {
 
     if (!applicant) {
         await bot.sendMessage(chatId, "Applicant not found.");
-        return;
+        return startLogic(msg, bot, db);
     }
 
     let managing = true;
@@ -40,6 +41,7 @@ const manageSkillsLogic = async (msg, bot, db) => {
             await bot.sendMessage(chatId, 'Exiting skill management.');
         }
     }
+    return startLogic(msg, bot, db);
 };
 
 async function addSkill(chatId, applicant, resume, bot, db) {

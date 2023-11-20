@@ -2,6 +2,7 @@
 const {db} = require('../../database/');
 // const { Session } = require('../../database/sql');
 const { commandHandler } = require('../utils/sessionUtils');
+const { startLogic } = require('./start');
 
 const logoutLogic = async (msg, bot, db) => {
     const { Session } = db;
@@ -14,6 +15,7 @@ const logoutLogic = async (msg, bot, db) => {
     } else {
         bot.sendMessage(chatId, 'You are not currently logged in.');
     }
+    return startLogic( bot, msg, db);
 };
 
 module.exports = (bot, db) => {

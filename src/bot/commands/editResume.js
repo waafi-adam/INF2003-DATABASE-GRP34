@@ -1,6 +1,7 @@
 // src/bot/commands/editResume.js
 const { waitForResponse, sendQuestionWithOptions } = require('../utils/messageUtils');
 const { commandHandler } = require('../utils/sessionUtils');
+const { startLogic } = require('./start');
 
 const editResumeLogic = async (msg, bot, db) => {
     // const { Applicant, Session, Resume } = db;
@@ -13,7 +14,7 @@ const editResumeLogic = async (msg, bot, db) => {
     let resume = await db.Resume.findOne({ applicantID: applicant.ApplicantID });
     if (!resume) {
         bot.sendMessage(chatId, "You do not have a resume to edit. Please create one first.");
-        return;
+        return startLogic(msg, bot, db) ;
     }
 
     // Main editing loop
@@ -39,6 +40,7 @@ const editResumeLogic = async (msg, bot, db) => {
                 break;
         }
     }
+    return startLogic(msg, bot, db);
 };
 
 const manageWorkExperiences = async (chatId, resume, bot, db) => {
@@ -57,7 +59,7 @@ const manageWorkExperiences = async (chatId, resume, bot, db) => {
         const selectedExp = resume.workExperience[expNumber];
         if (!selectedExp) {
             await bot.sendMessage(chatId, 'Invalid selection. Please try again.');
-            return;
+            return
         }
         const editOrRemoveResponse = await sendQuestionWithOptions(bot, chatId, 'Do you want to edit or remove this work experience?', ['Edit', 'Remove']);
         if (editOrRemoveResponse === 'Edit') {

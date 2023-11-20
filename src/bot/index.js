@@ -10,7 +10,7 @@ const bot = new TelegramBot(token, { polling: true });
 
 
 // Require and initialize your command handlers here
-const startCommand = require('./commands/start');
+const {startCommand} = require('./commands/start');
 const loginCommand = require('./commands/login');
 const logoutCommand = require('./commands/logout');
 const registerCommand = require('./commands/register');

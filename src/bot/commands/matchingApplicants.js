@@ -1,5 +1,6 @@
 const { waitForResponse, sendQuestionWithOptions } = require('../utils/messageUtils');
 const { commandHandler } = require('../utils/sessionUtils');
+const { startLogic } = require('./start');
 
 const matchApplicantsLogic = async (msg, bot, db) => {
     const { User, Session, Job, JobSkill, Applicant, ApplicantSkill, Company, Resume } = db;
@@ -8,24 +9,28 @@ const matchApplicantsLogic = async (msg, bot, db) => {
     // Check session and user role
     const session = await Session.findOne({ where: { SessionID: chatId, IsLoggedIn: true } });
     if (!session) {
-        return bot.sendMessage(chatId, "You must be logged in to use this command.");
+        await bot.sendMessage(chatId, "You must be logged in to use this command.");
+        return startLogic(msg, bot, db);
     }
 
     const user = await User.findByPk(session.UserID);
     if (!user || user.UserRole !== 'Company') {
-        return bot.sendMessage(chatId, "Only companies can match applicants to jobs.");
+        await bot.sendMessage(chatId, "Only companies can match applicants to jobs.");
+        return startLogic(msg, bot, db);
     }
 
     // Get company details
     const company = await Company.findByUserId(user.UserID);
     if (!company) {
-        return bot.sendMessage(chatId, "Company profile not found.");
+        await bot.sendMessage(chatId, "Company profile not found.");
+        return startLogic(msg, bot, db);
     }
 
     // Get company's jobs
     const jobs = await Job.findAll({ where: { CompanyID: company.CompanyID } });
     if (jobs.length === 0) {
-        return bot.sendMessage(chatId, "No jobs found for your company.");
+        await bot.sendMessage(chatId, "No jobs found for your company.");
+        return startLogic(msg, bot, db);
     }
 
     // Let the user select a job
@@ -107,6 +112,7 @@ const matchApplicantsLogic = async (msg, bot, db) => {
             }
         }
     }
+    return startLogic(msg, bot, db);
 };
 
 function formatDate(dateString) {

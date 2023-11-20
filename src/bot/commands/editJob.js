@@ -2,6 +2,7 @@
 // const { User, Session, Job, Company } = require('../../database/sql');
 const { waitForResponse, sendQuestionWithOptions } = require('../utils/messageUtils');
 const { commandHandler } = require('../utils/sessionUtils');
+const { startLogic } = require('./start');
 
 const editJobLogic = async (msg, bot, db) => {
     const { User, Session, Job, Company } = db;
@@ -10,24 +11,28 @@ const editJobLogic = async (msg, bot, db) => {
     // Check session and user role
     const session = await Session.findOne({ where: { SessionID: chatId, IsLoggedIn: true } });
     if (!session) {
-        return bot.sendMessage(chatId, "You must be logged in to edit a job.");
+        await bot.sendMessage(chatId, "You must be logged in to edit a job.");
+        return startLogic(msg, bot, db);
     }
 
     const user = await User.findByPk(session.UserID);
     if (!user || user.UserRole !== 'Company') {
-        return bot.sendMessage(chatId, "Only companies can edit jobs.");
+        await bot.sendMessage(chatId, "Only companies can edit jobs.");
+        return startLogic(msg, bot, db);
     }
 
     // Get company details
     const company = await Company.findOne({ where: { UserID: user.UserID } });
     if (!company) {
-        return bot.sendMessage(chatId, "Company profile not found.");
+        await bot.sendMessage(chatId, "Company profile not found.");
+        return startLogic(msg, bot, db);
     }
 
     // List company's jobs
     const companyJobs = await Job.findAll({ where: { CompanyID: company.CompanyID } });
     if (companyJobs.length === 0) {
-        return bot.sendMessage(chatId, 'You have not posted any jobs yet.');
+        await bot.sendMessage(chatId, 'You have not posted any jobs yet.');
+        return startLogic(msg, bot, db);
     }
 
     // Prepare options for job selection
@@ -37,7 +42,8 @@ const editJobLogic = async (msg, bot, db) => {
     const jobToEdit = await Job.findByPk(jobID);
 
     if (!jobToEdit) {
-        return bot.sendMessage(chatId, "Job not found.");
+        await bot.sendMessage(chatId, "Job not found.");
+        return startLogic(msg, bot, db);
     }
 
     // Show current job details
@@ -62,6 +68,7 @@ const editJobLogic = async (msg, bot, db) => {
     } else {
         bot.sendMessage(chatId, 'Job update canceled.');
     }
+    return startLogic(msg, bot, db);
 };
 
 module.exports = (bot, db) => {

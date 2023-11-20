@@ -4,19 +4,22 @@
 const { waitForResponse, sendQuestionWithOptions } = require('../utils/messageUtils');
 const { commandHandler } = require('../utils/sessionUtils');
 const {editResumeLogic} = require('./editResume.js');
+const {startLogic} = require('./start.js');
 
 const createResumeLogic = async (msg, bot, db) => {
   // const { User, Applicant, Session, ApplicantSkill, Resume } = db;
   const chatId = msg.chat.id;
   const session = await db.Session.findOne({ where: { SessionID: chatId } });
   if (!session || !session.UserID) {
-      bot.sendMessage(chatId, "You must be logged in to create a resume.");
+      await bot.sendMessage(chatId, "You must be logged in to create a resume.");
+      startLogic(msg, bot, db);
       return;
   }
 
   const user = await db.User.findByPk(session.UserID);
   if (!user) {
-      bot.sendMessage(chatId, "User not found in the database.");
+      await bot.sendMessage(chatId, "User not found in the database.");
+      startLogic(msg, bot, db);
       return;
   }
 
@@ -36,6 +39,8 @@ const createResumeLogic = async (msg, bot, db) => {
   });
 
   await processResumeCreation(chatId, resume, bot, db);
+  startLogic(msg, bot, db);
+  return
 };
 
 const handleExistingResume = async (chatId, userId, bot, msg, db) => {

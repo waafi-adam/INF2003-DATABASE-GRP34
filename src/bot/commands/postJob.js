@@ -2,6 +2,7 @@
 // const { User, Session, Job, JobSkill, Company } = require('../../database/sql');
 const { waitForResponse, sendQuestionWithOptions } = require('../utils/messageUtils');
 const { commandHandler } = require('../utils/sessionUtils');
+const { startLogic } = require('./start');
 
 const postJobLogic = async (msg, bot, db) => {
     const { User, Session, Job, JobSkill, Company } = db;
@@ -10,18 +11,21 @@ const postJobLogic = async (msg, bot, db) => {
     // Check session and user role
     const session = await Session.findOne({ where: { SessionID: chatId, IsLoggedIn: true } });
     if (!session) {
-        return bot.sendMessage(chatId, "You must be logged in to post a job.");
+        await bot.sendMessage(chatId, "You must be logged in to post a job.");
+        return startLogic(msg, bot, db);
     }
 
     const user = await User.findByPk(session.UserID);
     if (!user || user.UserRole !== 'Company') {
-        return bot.sendMessage(chatId, "Only companies can post jobs.");
+        await bot.sendMessage(chatId, "Only companies can post jobs.");
+        return startLogic(msg, bot, db);
     }
 
     // Get company details
     const company = await Company.findOne({ where: { UserID: user.UserID } });
     if (!company) {
-        return bot.sendMessage(chatId, "Company profile not found. Please register your company first.");
+        await bot.sendMessage(chatId, "Company profile not found. Please register your company first.");
+        return startLogic(msg, bot, db);
     }
 
     // Collect job title
@@ -67,6 +71,7 @@ const postJobLogic = async (msg, bot, db) => {
     } else {
         bot.sendMessage(chatId, 'Job posting canceled.');
     }
+    return startLogic(msg, bot, db);
 };
 
 module.exports = (bot, db) => {

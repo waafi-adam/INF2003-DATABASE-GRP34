@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 // const { User, Session } = require('../../database/sql');
 const { waitForResponse } = require('../utils/messageUtils');
 const { commandHandler } = require('../utils/sessionUtils');
+const { startLogic } = require('./start');
 
 const loginLogic = async (msg, bot, db) => {
     const { User, Session } = db;
@@ -12,13 +13,19 @@ const loginLogic = async (msg, bot, db) => {
     const email = await waitForResponse(bot, chatId);
     const user = await User.findOne({ where: { Email: email.trim().toLowerCase() } });
     
-    if (!user) return bot.sendMessage(chatId, 'Email not found.');
+    if (!user)  {
+        await bot.sendMessage(chatId, 'Email not found.');
+        return startLogic(msg, bot, db);
+    }
 
     bot.sendMessage(chatId, 'Please enter your password:');
     const password = await waitForResponse(bot, chatId);
 
     const isMatch = await bcrypt.compare(password.trim(), user.Password);
-    if (!isMatch) return bot.sendMessage(chatId, 'Password is incorrect.');
+    if (!isMatch) {
+        await bot.sendMessage(chatId, 'Password is incorrect.');
+        return startLogic(msg, bot, db);
+    }
 
     // Update or create a session with the given chatId
     await Session.upsert({
@@ -28,6 +35,7 @@ const loginLogic = async (msg, bot, db) => {
     });
 
     bot.sendMessage(chatId, 'You are now logged in.');
+    return startLogic(msg, bot, db);
 };
 
 const loginCommand = (bot, db) => {
