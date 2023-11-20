@@ -1,27 +1,28 @@
 // src/bot/commands/start.js
 const { isUserLoggedIn, getUserRole } = require('../utils/sessionUtils');
 
-const startCommand = (bot) => {
+const startCommand = (bot, db) => {
   bot.onText(/\/start/, async (msg) => {
     const chatId = msg.chat.id;
 
     try {
-      const loggedIn = await isUserLoggedIn(chatId);
+      const loggedIn = await isUserLoggedIn(chatId, db);
       if (loggedIn) {
-        const userRole = await getUserRole(chatId);
+        const userRole = await getUserRole(chatId, db);
         let optionsMessage = 'Here are your available commands:\n';
 
         if (userRole === 'Applicant') {
           // Commands available to applicants
           optionsMessage += '/create_resume - Create your resume\n';
           optionsMessage += '/edit_resume - Edit your resume\n';
+          optionsMessage += '/manage_skills - Manage your skills\n';
           optionsMessage += '/matching_jobs - Find jobs matching your profile\n';
         } else if (userRole === 'Company') {
           // Commands available to companies
           optionsMessage += '/post_job - Post a new job\n';
           optionsMessage += '/edit_job - Edit your job postings\n';
           optionsMessage += '/delete_job - Delete a job posting\n';
-          optionsMessage += '/matching_applicants - Find applicants matching your job postings\n';
+          optionsMessage += '/match_applicants - Find applicants matching your job postings\n';
         }
 
         optionsMessage += '/logout - Log out';

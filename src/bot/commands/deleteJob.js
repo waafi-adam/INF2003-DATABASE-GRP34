@@ -1,13 +1,14 @@
 // src/bot/commands/deleteJob.js
-const { User, Session, Job, Company } = require('../../database/sql');
+// const { User, Session, Job, Company } = require('../../database/sql');
 const {commandHandler} = require('../utils/sessionUtils');
 const { sendQuestionWithOptions, waitForResponse } = require('../utils/messageUtils');
 
-const deleteJobLogic = async (msg, bot) => {
+const deleteJobLogic = async (msg, bot, db) => {
+  const { User, Session, Job, Company } = db;
   const chatId = msg.chat.id;
 
   // Check session and role
-  const userSession = await Session.findOne({ where: { chatId: chatId, IsLoggedIn: true } });
+  const userSession = await Session.findOne({ where: { SessionID: chatId, IsLoggedIn: true } });
   const user = await User.findByPk(userSession?.UserID);
   const company = await Company.findOne({ where: { UserID: userSession?.UserID } });
 
@@ -42,6 +43,6 @@ const deleteJobLogic = async (msg, bot) => {
   }
 };
 
-module.exports = (bot) => {
-  bot.onText(/\/delete_job/, commandHandler(bot, deleteJobLogic, { requireLogin: true, requiredRole: 'Company' }));
+module.exports = (bot, db) => {
+  bot.onText(/\/delete_job/, commandHandler(bot, db, deleteJobLogic, { requireLogin: true, requiredRole: 'Company' }));
 };

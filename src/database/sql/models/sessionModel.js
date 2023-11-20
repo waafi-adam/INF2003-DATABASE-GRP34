@@ -2,7 +2,7 @@
 
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('Session', {
-    chatId: {
+    SessionID: {
       type: DataTypes.BIGINT,
       allowNull: false,
       primaryKey: true

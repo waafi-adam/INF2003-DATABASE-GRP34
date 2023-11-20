@@ -1,90 +1,74 @@
 // src/bot/commands/createResume.js
-const { User, ApplicantProfile, Session } = require('../../database/sql');
-const { Resume } = require('../../database/nosql');
+// const { User, Applicant, Session, ApplicantSkill } = require('../../database/sql');
+// const { Resume } = require('../../database/nosql');
 const { waitForResponse, sendQuestionWithOptions } = require('../utils/messageUtils');
 const { commandHandler } = require('../utils/sessionUtils');
+const {editResumeLogic} = require('./editResume.js');
 
+const createResumeLogic = async (msg, bot, db) => {
+  // const { User, Applicant, Session, ApplicantSkill, Resume } = db;
+  const chatId = msg.chat.id;
+  const session = await db.Session.findOne({ where: { SessionID: chatId } });
+  if (!session || !session.UserID) {
+      bot.sendMessage(chatId, "You must be logged in to create a resume.");
+      return;
+  }
 
-const createResumeLogic = async (msg, bot) => {
-    const chatId = msg.chat.id;
+  const user = await db.User.findByPk(session.UserID);
+  if (!user) {
+      bot.sendMessage(chatId, "User not found in the database.");
+      return;
+  }
 
-    // Fetch session to get the applicantUserID
-    const session = await Session.findOne({ where: { chatId: chatId } });
-    if (!session || !session.UserID) {
-        bot.sendMessage(chatId, "You must be logged in to create a resume.");
-        return;
-    }
+  const applicant = await db.Applicant.findOne({ where: { UserID: session.UserID } });
+  let resume = await db.Resume.findOne({ applicantID: applicant.ApplicantID });
+  if (resume) {
+      return handleExistingResume(chatId, user.UserID, bot, msg, db);
+  }
 
-    // Fetch user details from SQL database
-    const applicantProfile = await ApplicantProfile.findByPk(session.UserID);
-    if (!applicantProfile) {
-        bot.sendMessage(chatId, "ApplicantProfile not found in the database.");
-        return;
-    }
+  resume = new db.Resume({
+      applicantID: applicant.ApplicantID,
+      personalDetails: {
+          name: applicant.Name,
+          email: user.Email
+      },
+      skills: []
+  });
 
-    // Fetch or create a resume
-    let resume = await Resume.findOne({ applicantUserID: applicantProfile.UserID });
-    if (resume) {
-        return handleExistingResume(chatId, applicantProfile.UserID, bot);
-    }
-
-    // Fetch additional details from ApplicantProfile if needed
-    const profile = await ApplicantProfile.findOne({ where: { UserID: applicantProfile.UserID } });
-
-    // Create a new resume with applicantProfile details
-    resume = new Resume({
-        applicantUserID: applicantProfile.UserID,
-        personalDetails: {
-            name: profile ? profile.Name : '', // Assuming the name is stored in ApplicantProfile
-            email: applicantProfile.Email,
-        }
-    });
-    await resume.save();
-    await processResumeCreation(chatId, resume, bot);
+  await processResumeCreation(chatId, resume, bot, db);
 };
 
-
-
-const handleExistingResume = async (chatId, userId, bot) => {
-    
+const handleExistingResume = async (chatId, userId, bot, msg, db) => {
     const response = await sendQuestionWithOptions(bot, chatId, 'You already have a resume. Do you want to edit it or restart from scratch?', ['Edit Resume', 'Restart Resume']);
-
     if (response === 'Edit Resume') {
-        // Transfer to editResume.js logic
+        // Transfer to editResume.js logic (not implemented here)
+        editResumeLogic(msg, bot, db);
     } else if (response === 'Restart Resume') {
-        await Resume.deleteOne({ applicantUserID: userId });
-        const newResume = new Resume({ applicantUserID: userId });
+        await db.Resume.deleteOne({ applicantID: userId });
+        const newResume = new db.Resume({ applicantID: userId });
         await newResume.save();
-        await processResumeCreation(chatId, newResume, bot);
+        await processResumeCreation(chatId, newResume, bot, db);
     }
 };
 
-const processResumeCreation = async (chatId, resume, bot) => {
-    await getWorkExperience(chatId, resume, bot);
-    await getEducation(chatId, resume, bot);
-    await getSkills(chatId, resume, bot);
-    await getCertifications(chatId, resume, bot);
+const processResumeCreation = async (chatId, resume, bot, db) => {
+    const skills = await fetchApplicantSkills(resume.applicantID, db);
+    if (skills.length > 0) {
+        resume.skills = skills.map(skill => skill.SkillName);
+    } else {
+        console.log(`No skills found for applicantID: ${resume.applicantID}`);
+    }
+
+    await getWorkExperience(chatId, resume, bot, db);
+    await getEducation(chatId, resume, bot, db);
+    await getCertifications(chatId, resume, bot, db);
+
+    await resume.save();
     bot.sendMessage(chatId, 'Your resume has been created!');
 };
 
-const getPersonalDetails = async (chatId, resume, bot) => {
-    bot.sendMessage(chatId, 'What’s your full name?');
-    const name = await waitForResponse(bot, chatId);
-
-    bot.sendMessage(chatId, 'What’s your email address?');
-    const email = await waitForResponse(bot, chatId);
-
-    resume.personalDetails = { name, email };
-    await resume.save();
-};
-
-const askYesNoQuestion = async (bot, chatId, question) => {
-    return await sendQuestionWithOptions(bot, chatId, question, ['Yes', 'No']);
-};
-
-
-const getWorkExperience = async (chatId, resume, bot) => {
-    let response = await askYesNoQuestion(bot, chatId, 'Would you like to add a job experience?');
+const getWorkExperience = async (chatId, resume, bot, db) => {
+    let response = await sendQuestionWithOptions(bot, chatId, 'Would you like to add a job experience?', ['Yes', 'No']);
 
     while (response.toLowerCase() === 'yes') {
         bot.sendMessage(chatId, 'Enter your job title:');
@@ -106,12 +90,12 @@ const getWorkExperience = async (chatId, resume, bot) => {
         resume.workExperience.push({ title, company, startDate, endDate, description });
         await resume.save();
 
-        response = await askYesNoQuestion(bot, chatId, 'Do you want to add another job experience?');
+        response = await sendQuestionWithOptions(bot, chatId, 'Do you want to add another job experience?', ['Yes', 'No']);
     }
 };
 
-const getEducation = async (chatId, resume, bot) => {
-    let response = await askYesNoQuestion(bot, chatId, 'Would you like to add an education entry?');
+const getEducation = async (chatId, resume, bot, db) => {
+    let response = await sendQuestionWithOptions(bot, chatId, 'Would you like to add an education entry?', ['Yes', 'No']);
 
     while (response.toLowerCase() === 'yes') {
         bot.sendMessage(chatId, 'Enter the name of the institution:');
@@ -133,26 +117,12 @@ const getEducation = async (chatId, resume, bot) => {
         resume.education.push({ institution, degree, fieldOfStudy, startDate, endDate });
         await resume.save();
 
-        response = await askYesNoQuestion(bot, chatId, 'Do you want to add another education entry?');
+        response = await sendQuestionWithOptions(bot, chatId, 'Do you want to add another education entry?', ['Yes', 'No']);
     }
 };
 
-const getSkills = async (chatId, resume, bot) => {
-    let response = await askYesNoQuestion(bot, chatId, 'Would you like to add a skill?');
-
-    while (response.toLowerCase() === 'yes') {
-        bot.sendMessage(chatId, 'Enter a skill:');
-        const skill = await waitForResponse(bot, chatId);
-
-        resume.skills.push(skill);
-        await resume.save();
-
-        response = await askYesNoQuestion(bot, chatId, 'Would you like to add another skill?');
-    }
-};
-
-const getCertifications = async (chatId, resume, bot) => {
-    let response = await askYesNoQuestion(bot, chatId, 'Would you like to add a certification?');
+const getCertifications = async (chatId, resume, bot, db) => {
+    let response = await sendQuestionWithOptions(bot, chatId, 'Would you like to add a certification?', ['Yes', 'No']);
 
     while (response.toLowerCase() === 'yes') {
         bot.sendMessage(chatId, 'Enter the name of the certification:');
@@ -170,12 +140,18 @@ const getCertifications = async (chatId, resume, bot) => {
         resume.certifications.push({ name, issuer, date });
         await resume.save();
 
-        response = await askYesNoQuestion(bot, chatId, 'Would you like to add another certification?');
+        response = await sendQuestionWithOptions(bot, chatId, 'Would you like to add another certification?', ['Yes', 'No']);
     }
 
     bot.sendMessage(chatId, 'Certification(s) added to your resume.');
 };
 
-module.exports = (bot) => {
-    bot.onText(/\/create_resume/, commandHandler(bot, createResumeLogic, { requireLogin: true, requiredRole: 'Applicant' }));
+// Utility function to fetch skills from SQL database
+async function fetchApplicantSkills(applicantID, db) {
+    const skills = await db.ApplicantSkill.findAll({ where: { ApplicantID: applicantID } });
+    return skills || [];
+}
+
+module.exports = (bot, db) => {
+    bot.onText(/\/create_resume/, commandHandler(bot, db, createResumeLogic, { requireLogin: true, requiredRole: 'Applicant' }));
 };

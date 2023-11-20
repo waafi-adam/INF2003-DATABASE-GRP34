@@ -2,11 +2,11 @@
 const mongoose = require('mongoose');
 
 const resumeSchema = new mongoose.Schema({
-  applicantUserID: {
+  applicantID: {
     type: Number,
     required: true,
     unique: true,
-    ref: 'ApplicantProfile' // Reference to the ApplicantProfile in SQL database
+    ref: 'Applicant' // Reference to the Applicant in SQL database
   },
   personalDetails: {
     name: String,

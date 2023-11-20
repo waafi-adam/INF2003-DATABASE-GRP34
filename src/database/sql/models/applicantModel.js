@@ -1,16 +1,20 @@
-// src/database/sql/models/profileModel.js
+// src/database/sql/models/applicantModel.js
 
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define('ApplicantProfile', {
-    UserID: {
+  return sequelize.define('Applicant', {
+    ApplicantID: {
       type: DataTypes.INTEGER,
       primaryKey: true,
+      autoIncrement: true
+    },
+    UserID: {
+      type: DataTypes.INTEGER,
       references: {
         model: 'Users',
         key: 'UserID',
       }
     },
-    Name: { // Changed from ProfileData to Name
+    Name: {
       type: DataTypes.STRING,
       allowNull: false
     },

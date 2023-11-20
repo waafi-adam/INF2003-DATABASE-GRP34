@@ -1,10 +1,11 @@
 // src/bot/commands/login.js
 const bcrypt = require('bcrypt');
-const { User, Session } = require('../../database/sql');
+// const { User, Session } = require('../../database/sql');
 const { waitForResponse } = require('../utils/messageUtils');
 const { commandHandler } = require('../utils/sessionUtils');
 
-const loginLogic = async (msg, bot) => {
+const loginLogic = async (msg, bot, db) => {
+    const { User, Session } = db;
     const chatId = msg.chat.id;
     bot.sendMessage(chatId, 'Please enter your email:');
 
@@ -21,7 +22,7 @@ const loginLogic = async (msg, bot) => {
 
     // Update or create a session with the given chatId
     await Session.upsert({
-        chatId: chatId,
+        SessionID: chatId,
         UserID: user.UserID,
         IsLoggedIn: true
     });
@@ -29,8 +30,8 @@ const loginLogic = async (msg, bot) => {
     bot.sendMessage(chatId, 'You are now logged in.');
 };
 
-const loginCommand = (bot) => {
-    bot.onText(/\/login/, commandHandler(bot, loginLogic, { requireLogout: true }));
+const loginCommand = (bot, db) => {
+    bot.onText(/\/login/, commandHandler(bot, db, loginLogic, { requireLogout: true }));
 };
 
 module.exports = loginCommand;

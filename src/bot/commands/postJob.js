@@ -1,13 +1,14 @@
 // src/bot/commands/postJob.js
-const { User, Session, Job, Company } = require('../../database/sql');
+// const { User, Session, Job, JobSkill, Company } = require('../../database/sql');
 const { waitForResponse, sendQuestionWithOptions } = require('../utils/messageUtils');
 const { commandHandler } = require('../utils/sessionUtils');
 
-const postJobLogic = async (msg, bot) => {
+const postJobLogic = async (msg, bot, db) => {
+    const { User, Session, Job, JobSkill, Company } = db;
     const chatId = msg.chat.id;
 
     // Check session and user role
-    const session = await Session.findOne({ where: { chatId: chatId, IsLoggedIn: true } });
+    const session = await Session.findOne({ where: { SessionID: chatId, IsLoggedIn: true } });
     if (!session) {
         return bot.sendMessage(chatId, "You must be logged in to post a job.");
     }
@@ -24,27 +25,50 @@ const postJobLogic = async (msg, bot) => {
     }
 
     // Collect job title
-    bot.sendMessage(chatId, 'Enter the job title:');
+    await bot.sendMessage(chatId, 'Enter the job title:');
     const jobTitle = await waitForResponse(bot, chatId);
 
     // Collect job description
-    bot.sendMessage(chatId, 'Enter the job description:');
+    await bot.sendMessage(chatId, 'Enter the job description:');
     const jobDescription = await waitForResponse(bot, chatId);
+
+    // Collect job skills interactively
+    let jobSkills = [];
+    let addAnotherSkill = true;
+
+    while (addAnotherSkill) {
+        const addSkillConfirmation = await sendQuestionWithOptions(bot, chatId, 'Would you like to add a skill?', ['Yes', 'No']);
+        if (addSkillConfirmation === 'Yes') {
+            await bot.sendMessage(chatId, 'Enter the job skill:');
+            const skillInput = await waitForResponse(bot, chatId);
+            jobSkills.push(skillInput.trim());
+        } else {
+            addAnotherSkill = false;
+        }
+    }
 
     // Confirm before posting
     const confirmation = await sendQuestionWithOptions(bot, chatId, 'Do you want to post this job?', ['Yes', 'No']);
     if (confirmation === 'Yes') {
-        await Job.create({
+        const job = await Job.create({
             CompanyID: company.CompanyID,
             JobTitle: jobTitle,
             JobDescription: jobDescription
         });
+
+        for (const skillName of jobSkills) {
+            await JobSkill.create({
+                JobID: job.JobID,
+                SkillName: skillName
+            });
+        }
+
         bot.sendMessage(chatId, 'Your job has been posted successfully!');
     } else {
         bot.sendMessage(chatId, 'Job posting canceled.');
     }
 };
 
-module.exports = (bot) => {
-    bot.onText(/\/post_job/, commandHandler(bot, postJobLogic, { requireLogin: true, requiredRole: 'Company' }));
+module.exports = (bot, db) => {
+    bot.onText(/\/post_job/, commandHandler(bot, db, postJobLogic, { requireLogin: true, requiredRole: 'Company' }));
 };

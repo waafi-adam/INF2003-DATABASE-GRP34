@@ -1,13 +1,14 @@
 // src/bot/commands/editJob.js
-const { User, Session, Job, Company } = require('../../database/sql');
+// const { User, Session, Job, Company } = require('../../database/sql');
 const { waitForResponse, sendQuestionWithOptions } = require('../utils/messageUtils');
 const { commandHandler } = require('../utils/sessionUtils');
 
-const editJobLogic = async (msg, bot) => {
+const editJobLogic = async (msg, bot, db) => {
+    const { User, Session, Job, Company } = db;
     const chatId = msg.chat.id;
 
     // Check session and user role
-    const session = await Session.findOne({ where: { chatId: chatId, IsLoggedIn: true } });
+    const session = await Session.findOne({ where: { SessionID: chatId, IsLoggedIn: true } });
     if (!session) {
         return bot.sendMessage(chatId, "You must be logged in to edit a job.");
     }
@@ -63,6 +64,6 @@ const editJobLogic = async (msg, bot) => {
     }
 };
 
-module.exports = (bot) => {
-    bot.onText(/\/edit_job/, commandHandler(bot, editJobLogic, { requireLogin: true, requiredRole: 'Company' }));
+module.exports = (bot, db) => {
+    bot.onText(/\/edit_job/, commandHandler(bot, db, editJobLogic, { requireLogin: true, requiredRole: 'Company' }));
 };

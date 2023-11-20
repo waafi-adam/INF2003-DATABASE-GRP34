@@ -1,14 +1,15 @@
 // Import necessary models
-const { Resume, Skill } = require('../../database/nosql');
-const { User, Session, Job, Company } = require('../../database/sql');
+// const { Resume, Skill } = require('../../database/nosql');
+// const { User, Session, Job, Company, Applicant } = require('../../database/sql');
 
-module.exports = (bot) => {
+module.exports = (bot, db) => {
+  const { Resume, Skill,User, Session, Job, Company, Applicant } = db;
   bot.onText(/\/matchingApplicant/, async (msg) => {
     const chatId = msg.chat.id;
 
     try {
       // Check session and role
-      const userSession = await Session.findOne({ where: { chatId: chatId, IsLoggedIn: true } });
+      const userSession = await Session.findOne({ where: { SessionID: chatId, IsLoggedIn: true } });
       const user = await User.findByPk(userSession?.UserID);
 
       // Check user role
@@ -58,13 +59,13 @@ module.exports = (bot) => {
               const matchingResumes = await Resume.find({ skills: { $in: jobSkills.map(skill => skill.SkillName) } });
 
               // Find user who is linked to resume
-              const matchingUsers = await User.find({ _id: { $in: matchingResumes.map(resume => resume.applicantUserID) } });
+              const matchingApplicants = await Applicant.find({ _id: { $in: matchingResumes.map(resume => resume.applicantID) } });
 
               // Return top 3 users
-              const topMatchingUsers = matchingUsers.slice(0, 3);
+              const topMatchingApplicants = matchingApplicants.slice(0, 3);
 
               // Print the matched users
-              topMatchingUsers.forEach((matchedUser) => {
+              topMatchingApplicants.forEach((matchedUser) => {
                 bot.sendMessage(chatId, `User ID: ${matchedUser.UserID}\nUsername: ${matchedUser.Username}`);
               });
             } else {

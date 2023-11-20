@@ -1,12 +1,13 @@
 // src/bot/commands/register.js
 const bcrypt = require('bcrypt');
-const { User, ApplicantProfile, Company } = require('../../database/sql');
+// const { User, Applicant, Company } = require('../../database/sql');
 const {commandHandler} = require('../utils/sessionUtils');
 const { waitForResponse, sendQuestionWithOptions } = require('../utils/messageUtils');
 
 const emailRegex = /\S+@\S+\.\S+/;
 
-const registerLogic = async (msg, bot) => {
+const registerLogic = async (msg, bot, db) => {
+    const { User, Applicant, Company } = db;
     const chatId = msg.chat.id;
     const chatRegisterStates = {};
 
@@ -50,7 +51,7 @@ const registerLogic = async (msg, bot) => {
         if (role === 'Applicant') {
             bot.sendMessage(chatId, 'Please enter your full name:');
             const name = await waitForResponse(bot, chatId);
-            await ApplicantProfile.create({ UserID: state.userId, Name: name });
+            await Applicant.create({ UserID: state.userId, Name: name });
             bot.sendMessage(chatId, 'Your applicant profile has been created.');
         } else { // Company
             bot.sendMessage(chatId, 'Please enter your company name:');
@@ -69,8 +70,8 @@ const registerLogic = async (msg, bot) => {
     delete chatRegisterStates[chatId];
 };
 
-const registerCommand = (bot) => {
-    bot.onText(/\/register/, commandHandler(bot, registerLogic, { requireLogout: true }));
+const registerCommand = (bot, db) => {
+    bot.onText(/\/register/, commandHandler(bot, db, registerLogic, { requireLogout: true }));
 };
 
 module.exports = registerCommand;

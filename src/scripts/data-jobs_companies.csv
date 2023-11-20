@@ -1,0 +1,12 @@
+Email,Password,UserRole,CompanyName,Address,JobTitle,JobDescription,JobSkills
+hr@techsolutions.com,pass789,Company,Tech Solutions,"123 Tech Avenue","Software Developer","Develop and maintain web applications. To apply, send your resume to hr@techsolutions.com.","JavaScript, React, Node.js"
+careers@innovate.com,pass101,Company,Innovate Inc,"456 Innovation Drive","Product Manager","Oversee product development lifecycle. Interested candidates can apply at careers@innovate.com.","Project Management, Agile"
+recruit@datawiz.com,pass202,Company,DataWiz Inc,"789 Data Street","Data Scientist","Analyze large data sets for insights. Apply by emailing your CV to recruit@datawiz.com.","Python, Machine Learning"
+jobs@marketleaders.com,pass303,Company,Market Leaders,"101 Marketing Blvd","Digital Marketer","Manage online marketing campaigns. Submit your application via jobs@marketleaders.com.","Digital Marketing, SEO"
+talent@securenet.com,pass404,Company,SecureNet,"202 Security Lane","Cybersecurity Specialist","Implement and monitor security measures. Apply at talent@securenet.com with your resume.","Cybersecurity, Ethical Hacking"
+hr@creativearts.com,pass505,Company,Creative Arts,"303 Design Road","Graphic Designer","Create visual concepts and designs. Interested applicants should email hr@creativearts.com.","Adobe Photoshop, Illustrator"
+careers@greentech.com,pass606,Company,GreenTech,"404 Eco Park","Environmental Engineer","Develop solutions to environmental problems. Send applications to careers@greentech.com.","Environmental Science, Engineering"
+jobs@financesavvy.com,pass707,Company,Finance Savvy,"505 Money Ave","Financial Analyst","Analyze financial data and trends. To apply, contact us at jobs@financesavvy.com.","Finance, Data Analysis"
+recruit@healthplus.com,pass808,Company,HealthPlus,"606 Wellness Way","Healthcare Administrator","Manage healthcare facility operations. Send your resume to recruit@healthplus.com to apply.","Healthcare Management, Administration"
+talent@buildrite.com,pass909,Company,BuildRite,"707 Construction Ct","Civil Engineer","Plan and oversee construction projects. Application submissions at talent@buildrite.com.","Civil Engineering, Project Management"
+company@email.com,password,Company,Test Company,"123 Business Road","Senior Developer","Responsible for leading the development of sophisticated web applications using JavaScript, React, and Node.js. To apply, email company@email.com.","JavaScript, React, Node.js"

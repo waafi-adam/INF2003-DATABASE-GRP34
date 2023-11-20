@@ -1,0 +1,65 @@
+@startuml
+
+' Define entities for relational database
+entity "User" as user {
+  +UserID : integer
+  Email : string
+  Password : string
+  UserRole : enum (Applicant, Company)
+}
+
+entity "Applicant" as profile {
+  +ApplicantID : integer
+  UserID : integer (FK)
+  ---
+  Name : string
+}
+
+entity "Company" as company {
+  +CompanyID : integer
+  UserID : integer (FK)
+  ---
+  CompanyName : string
+  Address : text
+}
+
+entity "Job" as job {
+  +JobID : integer
+  CompanyID : integer (FK)
+  ---
+  JobTitle : string
+  JobDescription : text
+}
+
+entity "ApplicantSkill" as applicantSkill {
+  +ApplicantSkillID : integer
+  ApplicantID : integer (FK)
+  ---
+  SkillName : string
+}
+
+entity "JobSkill" as jobSkill {
+  +JobSkillID : integer
+  JobID : integer (FK)
+  ---
+  SkillName : string
+}
+
+entity "Session" as session {
+  +ChatId : bigint
+  UserID : integer (FK)
+  ---
+  IsLoggedIn : boolean
+}
+
+' Specify the relationship between entities
+user -- profile : "has >"
+user -- company : "operates >"
+company -- job : "publishes >"
+profile -- applicantSkill : "has >"
+job -- jobSkill : "requires >"
+
+' MongoDB components
+note right of profile : MongoDB\n<Resume Schema>\n- ApplicantID (FK)\n- PersonalDetails (dynamic)\n- WorkExperience (dynamic)\n- Education (dynamic)\n- Skills (dynamic)\n- Certifications (dynamic)\nEach array in the Resume can be dynamic or even omitted.
+
+@enduml

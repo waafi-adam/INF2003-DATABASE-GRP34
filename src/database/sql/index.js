@@ -2,46 +2,44 @@
 
 const Sequelize = require('sequelize');
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: './src/database/sql/database.sqlite', // Updated storage path
-  logging: false
-});
-
-const db = {};
-
-// Models
-db.User = require('./models/userModel')(sequelize, Sequelize.DataTypes);
-db.ApplicantProfile = require('./models/profileModel')(sequelize, Sequelize.DataTypes);
-db.Company = require('./models/companyModel')(sequelize, Sequelize.DataTypes);
-db.Job = require('./models/jobModel')(sequelize, Sequelize.DataTypes);
-db.Skill = require('./models/skillModel')(sequelize, Sequelize.DataTypes);
-db.Session = require('./models/sessionModel')(sequelize, Sequelize.DataTypes);
-
-
-// Associations
-db.User.hasOne(db.ApplicantProfile, { foreignKey: 'UserID' });
-db.ApplicantProfile.belongsTo(db.User, { foreignKey: 'UserID' });
-
-db.User.hasMany(db.Company, { foreignKey: 'UserID' });
-db.Company.belongsTo(db.User, { foreignKey: 'UserID' });
-
-db.Company.hasMany(db.Job, { foreignKey: 'CompanyID' });
-db.Job.belongsTo(db.Company, { foreignKey: 'CompanyID' });
-
-
-// Skills associations would be many-to-many, require a join table
-db.Skill.belongsToMany(db.ApplicantProfile, { through: 'ProfileSkills', foreignKey: 'SkillID' });
-db.ApplicantProfile.belongsToMany(db.Skill, { through: 'ProfileSkills', foreignKey: 'UserID' });
-
-db.Skill.belongsToMany(db.Job, { through: 'JobSkills', foreignKey: 'SkillID' });
-db.Job.belongsToMany(db.Skill, { through: 'JobSkills', foreignKey: 'JobID' });
-
-  
-  // Sync new join tables with database
-  sequelize.sync().then(() => {
-    console.log('Join tables created!');
+const connectSql = async() =>{
+  const sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: './src/database/sql/database.sqlite',
+    logging: false
   });
+  const sqlDB = {};
   
+  // Importing models
+  sqlDB.User = require('./models/userModel')(sequelize, Sequelize.DataTypes);
+  sqlDB.Applicant = require('./models/applicantModel')(sequelize, Sequelize.DataTypes);
+  sqlDB.Company = require('./models/companyModel')(sequelize, Sequelize.DataTypes);
+  sqlDB.Job = require('./models/jobModel')(sequelize, Sequelize.DataTypes);
+  sqlDB.ApplicantSkill = require('./models/applicantSkillModel')(sequelize, Sequelize.DataTypes);
+  sqlDB.JobSkill = require('./models/jobSkillModel')(sequelize, Sequelize.DataTypes);
+  sqlDB.Session = require('./models/sessionModel')(sequelize, Sequelize.DataTypes);
+  
+  // Associations
+  sqlDB.User.hasOne(sqlDB.Applicant, { foreignKey: 'UserID' });
+  sqlDB.Applicant.belongsTo(sqlDB.User, { foreignKey: 'UserID' });
+  
+  sqlDB.User.hasMany(sqlDB.Company, { foreignKey: 'UserID' });
+  sqlDB.Company.belongsTo(sqlDB.User, { foreignKey: 'UserID' });
+  
+  sqlDB.Company.hasMany(sqlDB.Job, { foreignKey: 'CompanyID' });
+  sqlDB.Job.belongsTo(sqlDB.Company, { foreignKey: 'CompanyID' });
+  
+  sqlDB.Applicant.hasMany(sqlDB.ApplicantSkill, { foreignKey: 'ApplicantID' });
+  sqlDB.ApplicantSkill.belongsTo(sqlDB.Applicant, { foreignKey: 'ApplicantID' });
+  
+  sqlDB.Job.hasMany(sqlDB.JobSkill, { foreignKey: 'JobID' });
+  sqlDB.JobSkill.belongsTo(sqlDB.Job, { foreignKey: 'JobID' });
+  
+  // Sync tables with database
+  await sequelize.sync().then(() => {
+    // console.log('Database tables created!');
+  });
+  return sqlDB
+}
 
-  module.exports = db;
+module.exports = {connectSql};

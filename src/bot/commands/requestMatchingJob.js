@@ -1,21 +1,20 @@
 //returns jobs that match the applicants skill based on the resume
+// const { Resume } = require('../../database/nosql');
+// const { User, Session, Applicant, Job, Company } = require('../../database/sql');
 
-const { Resume } = require('../../database/nosql');
-const { User, Session, Job, Company } = require('../../database/sql');
-
-module.exports = (bot) => {
-
+module.exports = (bot, db) => {
+  const { Resume, User, Session, Applicant, Job, Company } = db;
   bot.onText(/\/matching_jobs/, async (msg) => {
     const chatId = msg.chat.id;
 
     // Check session and role
-    const userSession = await Session.findOne({ where: { chatId: chatId, IsLoggedIn: true } });
+    const userSession = await Session.findOne({ where: { SessionID: chatId, IsLoggedIn: true } });
     const user = await User.findByPk(userSession?.UserID);
+    const applicant = await Applicant.findByPk(userSession?.UserID);
 
     //check user role
     if (!userSession || user?.UserRole !== 'Applicant') {
       bot.sendMessage(chatId, 'You must be logged in with a applicant account!');
-      
     }
     //user is applicant
     else {
@@ -33,7 +32,7 @@ module.exports = (bot) => {
       }
       
       //get user resume
-      let resume = await Resume.findOne({ applicantUserID: userSession?.UserID});
+      let resume = await Resume.findOne({ applicantID: applicant?.ApplicantID});
       //if resume exists
       if (resume){
         bot.sendMessage(chatId,'You have a resume!'); //debugging purposes 

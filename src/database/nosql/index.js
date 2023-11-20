@@ -1,22 +1,32 @@
 // src/database/nosql/index.js
-
 const mongoose = require('mongoose');
-require('dotenv').config();
 
-const uri = "mongodb+srv://inf2003-database-grp34:db123@jobifytelebot.atvq7re.mongodb.net/JobifyTelebot?retryWrites=true&w=majority"
-mongoose.connect(/*process.env.MONGO_URI*/ uri, { 
-  useNewUrlParser: true, 
-  useUnifiedTopology: true,
-  connectTimeoutMS: 10000, // 10 seconds
-  socketTimeoutMS: 45000   // 45 seconds
-})
-.then(() => console.log('Connected to MongoDB.'))
-.catch(err => console.error('Could not connect to MongoDB.', err));
+const connectNoSql = async (uri) => {
+  const maxRetries = 5; // Maximum number of retries
+  let currentAttempt = 0;
 
-const db = {};
+  while (currentAttempt < maxRetries) {
+    try {
+      await mongoose.connect(uri, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        connectTimeoutMS: 3000, // 3 seconds
+        socketTimeoutMS: 5000   // 5 seconds
+      });
+      console.log('Connected to MongoDB.');
+      const noSqlDB = {
+        mongoose: mongoose,
+        Resume: require('./schemas/resumeSchema')
+      };
+      return noSqlDB;
+    } catch (err) {
+      currentAttempt++;
+      console.error(`Attempt ${currentAttempt}: Could not connect to MongoDB. Retrying in 5 seconds...`, err);
+      await new Promise(resolve => setTimeout(resolve, 5000)); // Wait for 5 seconds
+    }
+  }
 
-db.mongoose = mongoose;
-db.Resume = require('./schemas/resumeSchema');
+  throw new Error('Failed to connect to MongoDB after several attempts.');
+};
 
-
-module.exports = db;
+module.exports = { connectNoSql };
