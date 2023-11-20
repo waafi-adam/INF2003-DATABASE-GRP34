@@ -14,7 +14,7 @@ const startLogic = async(msg, bot, db) =>{
         optionsMessage += '/create_resume - Create your resume\n';
         optionsMessage += '/edit_resume - Edit your resume\n';
         optionsMessage += '/manage_skills - Manage your skills\n';
-        optionsMessage += '/matching_jobs - Find jobs matching your profile\n';
+        optionsMessage += '/match_jobs - Find jobs matching your profile\n';
       } else if (userRole === 'Company') {
         // Commands available to companies
         optionsMessage += '/post_job - Post a new job\n';

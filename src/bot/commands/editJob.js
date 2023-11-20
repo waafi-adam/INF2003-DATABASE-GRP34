@@ -47,7 +47,7 @@ const editJobLogic = async (msg, bot, db) => {
     }
 
     // Show current job details
-    bot.sendMessage(chatId, `Current Job Title: ${jobToEdit.JobTitle}\nCurrent Description: ${jobToEdit.JobDescription}`);
+    await bot.sendMessage(chatId, `Current Job Title: ${jobToEdit.JobTitle}\nCurrent Description: ${jobToEdit.JobDescription}`);
 
     // Collect new job title
     bot.sendMessage(chatId, 'Enter the new job title:');

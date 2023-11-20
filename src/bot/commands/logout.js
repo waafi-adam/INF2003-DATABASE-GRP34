@@ -15,7 +15,7 @@ const logoutLogic = async (msg, bot, db) => {
     } else {
         bot.sendMessage(chatId, 'You are not currently logged in.');
     }
-    return startLogic( bot, msg, db);
+    return startLogic( msg, bot, db);
 };
 
 module.exports = (bot, db) => {

@@ -20,9 +20,8 @@ const manageSkills = require('./commands/manageSkills');
 const postJobCommand = require('./commands/postJob');
 const editJobCommand = require('./commands/editJob');
 const deleteJobCommand = require('./commands/deleteJob');
-const matchingApplicantsCommand = require('./commands/matchingApplicants');
-// const matchingJobCommand = require('./commands/requestMatchingJob.js');
-// const matchingApplicantCommand = require('./commands/requestMatchingApplicant.js')
+const matchApplicantsCommand = require('./commands/matchApplicants');
+const matchJobsCommand = require('./commands/matchJobs');
 
 const start = async()=>{
     const db = await connectDB(process.env.MONGO_URI);
@@ -33,14 +32,13 @@ const start = async()=>{
     logoutCommand(bot, db);
     registerCommand(bot, db);
     createResumeCommand(bot, db);
-    editResumeCommand(bot, db);
+    editResumeCommand(bot, db); 
     manageSkills(bot, db);
     postJobCommand(bot, db);
     editJobCommand(bot, db);
     deleteJobCommand(bot, db);
-    matchingApplicantsCommand(bot, db);
-    // matchingJobCommand(bot, db);
-    // matchingApplicantCommand(bot, db);
+    matchApplicantsCommand(bot, db);
+    matchJobsCommand(bot, db);
 }
 start();
 
