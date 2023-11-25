@@ -1,0 +1,7 @@
+{
+    "name": "My Telegram Bot",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "bot",
+    "workspaceFolder": "/usr/src/app"
+  }
+  

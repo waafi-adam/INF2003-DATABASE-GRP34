@@ -78,21 +78,28 @@ require('dotenv').config();
   };
   
 
-  // Function to save companies
+  // Function to save companies and jobs
   const saveCompanies = async (companiesData) => {
     for (const data of companiesData) {
-      const hashedPassword = await bcrypt.hash(data.Password, 10);
-      const user = await User.create({
-        Email: data.Email,
-        Password: hashedPassword,
-        UserRole: 'Company'
-      });
+      let user = await User.findOne({ where: { Email: data.Email } });
+      let company;
 
-      const company = await Company.create({
-        UserID: user.UserID,
-        CompanyName: data.CompanyName,
-        Address: data.Address
-      });
+      if (!user) {
+        const hashedPassword = await bcrypt.hash(data.Password, 10);
+        user = await User.create({
+          Email: data.Email,
+          Password: hashedPassword,
+          UserRole: 'Company'
+        });
+
+        company = await Company.create({
+          UserID: user.UserID,
+          CompanyName: data.CompanyName,
+          Address: data.Address
+        });
+      } else {
+        company = await Company.findOne({ where: { UserID: user.UserID } });
+      }
 
       const job = await Job.create({
         CompanyID: company.CompanyID,
