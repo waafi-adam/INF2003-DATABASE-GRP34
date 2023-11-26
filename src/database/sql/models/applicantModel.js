@@ -1,7 +1,6 @@
 // src/database/sql/models/applicantModel.js
-
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define('Applicant', {
+  const Applicant = sequelize.define('Applicant', {
     ApplicantID: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -18,5 +17,19 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false
     },
+  }, {
+    indexes: [
+      {
+        unique: true,
+        fields: ['UserID'],
+        using: 'BTREE'
+      },
+      {
+        fields: ['Name'],
+        using: 'BTREE'
+      }
+    ]
   });
+
+  return Applicant;
 };

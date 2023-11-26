@@ -1,6 +1,7 @@
-// src/database/sql/models/sessionModel.js
+// src/database_rejected/sql/models/sessionModel.js
+
 module.exports = (sequelize, DataTypes) => {
-  const Session = sequelize.define('Session', {
+  return sequelize.define('Session', {
     SessionID: {
       type: DataTypes.BIGINT,
       allowNull: false,
@@ -18,5 +19,4 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: false
     }
   });
-  return Session;
 };

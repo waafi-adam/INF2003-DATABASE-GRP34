@@ -1,6 +1,7 @@
-// src/database/sql/models/jobSkillModel.js
+// src/database_rejected/sql/models/jobSkillModel.js
+
 module.exports = (sequelize, DataTypes) => {
-  const JobSkill = sequelize.define('JobSkill', {
+  return sequelize.define('JobSkill', {
     JobSkillID: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -16,18 +17,6 @@ module.exports = (sequelize, DataTypes) => {
     SkillName: {
       type: DataTypes.STRING,
       allowNull: false
-    },
-  }, {
-    indexes: [
-      {
-        fields: ['JobID'],
-        using: 'BTREE'
-      },
-      {
-        fields: ['SkillName'],
-        using: 'BTREE'
-      }
-    ]
+    }
   });
-  return JobSkill;
 };

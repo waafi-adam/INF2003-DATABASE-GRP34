@@ -1,6 +1,7 @@
-// src/database/sql/models/applicantSkillModel.js
+// src/database_rejected/sql/models/applicantSkillModel.js
+
 module.exports = (sequelize, DataTypes) => {
-  const ApplicantSkill = sequelize.define('ApplicantSkill', {
+  return sequelize.define('ApplicantSkill', {
     ApplicantSkillID: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -16,19 +17,6 @@ module.exports = (sequelize, DataTypes) => {
     SkillName: {
       type: DataTypes.STRING,
       allowNull: false
-    },
-  }, {
-    indexes: [
-      {
-        fields: ['ApplicantID'],
-        using: 'BTREE'
-      },
-      {
-        fields: ['SkillName'],
-        using: 'BTREE'
-      }
-    ]
+    }
   });
-
-  return ApplicantSkill;
 };

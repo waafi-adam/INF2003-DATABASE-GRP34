@@ -1,7 +1,6 @@
 // src/database/sql/models/skillModel.js
-
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define('Skill', {
+  const Skill = sequelize.define('Skill', {
     SkillID: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -10,5 +9,13 @@ module.exports = (sequelize, DataTypes) => {
     SkillName: {
       type: DataTypes.STRING
     },
+  }, {
+    indexes: [
+      {
+        fields: ['SkillName'],
+        using: 'BTREE'
+      }
+    ]
   });
+  return Skill;
 };

@@ -1,11 +1,11 @@
-// src/database/sql/index.js
+// src/database_rejected/sql/index.js
 
 const Sequelize = require('sequelize');
 
 const connectSql = async() =>{
   const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: './src/database/sql/sqlDB.sqlite',
+    storage: './src/database_rejected/sql/sqlDB_rejected.sqlite',
     logging: false
   });
   const sqlDB = {};

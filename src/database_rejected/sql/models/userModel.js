@@ -1,6 +1,7 @@
-// src/database/sql/models/userModel.js
+// src/database_rejected/sql/models/userModel.js
+
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
+  return sequelize.define('User', {
     UserID: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -19,14 +20,5 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM('Applicant', 'Company'),
       allowNull: false
     },
-  }, {
-    indexes: [
-      {
-        unique: true,
-        fields: ['Email'],
-        using: 'BTREE'
-      }
-    ]
   });
-  return User;
 };

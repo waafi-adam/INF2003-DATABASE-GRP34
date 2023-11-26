@@ -19,11 +19,16 @@ Jobify Bot is a Telegram bot designed to facilitate connections between job seek
 
 ## Getting Started
 
+## Getting Started
+
 1. **Install Node.js**: Ensure Node.js is installed on your system.
 2. **Clone the Repository**: Clone the Jobify Bot repository to your local machine.
 3. **Install Dependencies**: Navigate to the project directory and run `npm install` to install all necessary dependencies.
 4. **Run the Bot**: Start the bot with the command `npm start`.
 5. **Access the Bot**: Open Telegram and search for [@inf2003_database_grp24_jobifyBot](https://t.me/inf2003_database_grp24_jobifyBot) to begin interacting with Jobify Bot.
+6. **Demo Accounts**: For a quick start, you can use demo accounts to explore the bot's features:
+   - For applicants, use `applicant@email.com` with the password `password`.
+   - For companies, use `company@email.com` with the password `password`.
 
 ## Available Commands
 
